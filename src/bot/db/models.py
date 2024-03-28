@@ -10,11 +10,11 @@ class Base(AsyncAttrs, DeclarativeBase):
 class Direction(Base):
     __tablename__ = 'directions'
     title: Mapped[str]
-    description: Mapped[Text]
+    description: Mapped[str] = mapped_column(Text)
 
 
 class User(Base):
     __tablename__ = 'users'
     name: Mapped[str]
     phone_number: Mapped[str]
-    tg_id: Mapped[BigInteger]
+    tg_id: Mapped[int] = mapped_column(BigInteger)

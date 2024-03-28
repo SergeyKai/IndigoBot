@@ -1,19 +1,18 @@
-from flask import Flask, render_template
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
-from flask_admin import Admin
-from flask_admin.contrib.sqla import ModelView
+app = FastAPI()
 
-app = Flask(__name__)
-
+templates = Jinja2Templates('templates')
+app.mount('/static', StaticFiles(directory='static'), 'static')
 
 @app.get('/')
-def index():
-    return render_template('index.html')
+async def index(request: Request):
+    return templates.TemplateResponse('index.html', {'request': request})
 
-
-admin = Admin(app, name='Панель Администратора', template_mode='bootstrap4')
-
-admin.add_view(ModelView())
 
 if __name__ == '__main__':
-    app.run()
+    import uvicorn
+
+    uvicorn.run(app)
