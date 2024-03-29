@@ -6,9 +6,11 @@ import logging
 from bot import main_router
 
 from bot.settings import BotConfig
+from src.bot.commands import Commands
 
 
 async def bot_start(bot: Bot) -> None:
+    await Commands.set_commands(bot)
     await bot.send_message(BotConfig.ADMIN_ID, text='Bot is running')
 
 
@@ -18,9 +20,11 @@ async def main():
     bot = Bot(token=BotConfig.TOKEN, parse_mode=ParseMode.HTML)
     dp = Dispatcher()
 
-    await bot.delete_webhook(drop_pending_updates=True)
+    dp.startup.register(bot_start)
 
     dp.include_routers(main_router, )
+
+    await bot.delete_webhook(drop_pending_updates=True)
 
     try:
         await dp.start_polling(bot)
