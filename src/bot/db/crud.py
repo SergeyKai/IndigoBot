@@ -1,7 +1,9 @@
-from typing import Union
+from typing import Union, Sequence
 
 from .manager import SessionFactory
 from sqlalchemy import select
+
+from .models import Direction
 
 
 class BaseCrud:
@@ -22,6 +24,16 @@ class BaseCrud:
             stmt = select(self.model).where(self.model.id == pk)
             return await session.scalar(stmt)
 
+    async def all(self) -> Sequence:
+        """
+        :return: list of objects model
+        :return: Список объектов модели
+        """
+        async with SessionFactory().session() as session:
+            stmt = select(self.model)
+            result = await session.scalars(stmt)
+            return result.all()
+
     async def create(self, **kwargs) -> Union[model, None]:
         """
         :param kwargs: dict: arguments for creation new instance of model
@@ -36,5 +48,20 @@ class BaseCrud:
                 await session.commit()
                 return obj
             except Exception as e:
+                print(e)
                 session.rollback()
                 return None
+
+    async def update(self, obj) -> model:
+        """
+        :param obj: object ORM
+        :param obj: объект ORM
+        """
+        async with SessionFactory().session() as session:
+            session.add(obj)
+            await session.commit()
+
+
+class DirectionCrud(BaseCrud):
+    model = Direction
+

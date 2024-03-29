@@ -1,0 +1,27 @@
+{% extends "base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+
+    <form class="" method="post">
+
+        <div class="mb-3">
+            <label for="1" class="form-label">Название</label>
+            <input type="text" class="form-control" id="1" required name="title" {% if obj %} value="{{obj.title}}" {% endif%}>
+        </div>
+
+        <div class="mb-3">
+            <label for="2" class="form-label">Описание</label>
+            <textarea class="form-control" id="2" placeholder="Required example textarea" required
+                      name="description" >{% if obj %}{{ obj.description }}{% endif%}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Сохранить</button>
+        </div>
+    </form>
+
+</div>
+
+{% endblock main %}

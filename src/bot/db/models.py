@@ -12,6 +12,9 @@ class Direction(Base):
     title: Mapped[str]
     description: Mapped[str] = mapped_column(Text)
 
+    def __repr__(self):
+        return f'id: {self.id} title: {self.title}'
+
 
 class User(Base):
     __tablename__ = 'users'
