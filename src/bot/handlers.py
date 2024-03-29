@@ -5,6 +5,8 @@ from aiogram.types import Message
 from aiogram.types import InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from src.bot import resources
+
 router = Router()
 
 directions_list = [
@@ -29,11 +31,9 @@ def directions_kb():
 
 @router.message(CommandStart())
 async def start(message: Message):
-    await message.answer('Hello!')
+    await message.answer(resources.texts.get('start'))
 
 
 @router.message(Command('directions'))
 async def directions(message: Message):
     await message.answer('Направления', reply_markup=directions_kb())
-
-

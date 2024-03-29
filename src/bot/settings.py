@@ -17,6 +17,4 @@ class DBConfig:
 @dataclass
 class BotConfig:
     TOKEN: str = os.getenv('TOKEN')
-
-
-print(BASE_DIR)
+    ADMIN_ID: str = os.getenv('ADMIN_ID')

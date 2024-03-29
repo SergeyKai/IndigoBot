@@ -8,6 +8,10 @@ from bot import main_router
 from bot.settings import BotConfig
 
 
+async def bot_start(bot: Bot) -> None:
+    await bot.send_message(BotConfig.ADMIN_ID, text='Bot is running')
+
+
 async def main():
     logging.basicConfig(level=logging.INFO)
 
