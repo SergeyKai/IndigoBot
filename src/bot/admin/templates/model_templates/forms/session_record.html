@@ -1,0 +1,55 @@
+{% extends "base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+
+    <form class="mt-5" method="post">
+
+        {% if obj %}
+        <h1>{{ obj }}</h1>
+        {% endif%}
+        <div class="mb-3">
+            <label for="user" class="form-label">Пользователь</label>
+            <select class="form-select" name="user" id="user">
+                {% for user in users %}
+                {% if obj and obj.user_id == user.id %}
+                <option value="{{ user.id }}" selected>{{ user }}</option>
+                {% else %}
+                <option value="{{ user.id }}">{{ user }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+
+            <label for="session" class="form-label">Событие</label>
+            <select class="form-select" name="session" id="session">
+                {% for session in sessions %}
+                {% if obj and obj.session_id == session.id %}
+                <option value="{{ session.id }}" selected>{{ session }}</option>
+                {% else %}
+                <option value="{{ session.id }}">{{ session }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+
+        </div>
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Сохранить</button>
+        </div>
+    </form>
+    {% if obj %}
+    <form action="/delete-user/" method="post">
+        <input type="hidden" value="{{obj.id}}" name="obj_id">
+        <div class="mb-3">
+            <button class="btn btn-danger" type="submit">Удалить</button>
+        </div>
+    </form>
+    {% endif%}
+
+</div>
+
+{% endblock main %}

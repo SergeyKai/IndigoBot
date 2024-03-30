@@ -29,10 +29,11 @@ class User(Base):
 
 class Session(Base):
     __tablename__ = 'session'
+    title: Mapped[str]
     direction_id: Mapped[int] = mapped_column(ForeignKey('direction.id'))
     direction: Mapped[Direction] = relationship(back_populates="sessions")
 
-    data: Mapped[Date] = mapped_column(Date)
+    date: Mapped[Date] = mapped_column(Date)
     time: Mapped[Time] = mapped_column(Time)
 
     session_records: Mapped[list['SessionRecord']] = relationship("SessionRecord", back_populates="session")

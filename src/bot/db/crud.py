@@ -3,7 +3,7 @@ from typing import Union, Sequence
 from .manager import SessionFactory
 from sqlalchemy import select
 
-from .models import Direction, User
+from .models import Direction, User, Session, SessionRecord
 
 
 class BaseCrud:
@@ -49,7 +49,7 @@ class BaseCrud:
                 return obj
             except Exception as e:
                 print(e)
-                session.rollback()
+                await session.rollback()
                 return None
 
     async def update(self, obj) -> model:
@@ -79,3 +79,11 @@ class DirectionCrud(BaseCrud):
 
 class UserCrud(BaseCrud):
     model = User
+
+
+class SessionCrud(BaseCrud):
+    model = Session
+
+
+class SessionRecordCrud(BaseCrud):
+    model = SessionRecord
