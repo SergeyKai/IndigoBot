@@ -8,11 +8,11 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 
 class Direction(Base):
-    __tablename__ = 'directions'
+    __tablename__ = 'direction'
     title: Mapped[str]
     description: Mapped[str] = mapped_column(Text)
 
-    sessions: Mapped[list['Sessions']] = relationship("Sessions", back_populates="direction")
+    sessions: Mapped[list['Session']] = relationship("Session", back_populates="direction")
 
     def __repr__(self):
         return f'id: {self.id} title: {self.title}'
@@ -24,24 +24,24 @@ class User(Base):
     phone_number: Mapped[str]
     tg_id: Mapped[int] = mapped_column(BigInteger)
 
-    sessions_record: Mapped[list['SessionRecord']] = relationship("SessionRecord", back_populates="user")
+    session_records: Mapped[list['SessionRecord']] = relationship("SessionRecord", back_populates="user")
 
 
-class Sessions(Base):
-    __tablename__ = 'sessions'
-    direction: Mapped[Direction] = relationship(Direction, back_populates="sessions")
-    direction_id: Mapped[int] = relationship(ForeignKey('direction'))
+class Session(Base):
+    __tablename__ = 'session'
+    direction_id: Mapped[int] = mapped_column(ForeignKey('direction.id'))
+    direction: Mapped[Direction] = relationship(back_populates="sessions")
 
     data: Mapped[Date] = mapped_column(Date)
     time: Mapped[Time] = mapped_column(Time)
 
-    sessions_record: Mapped[list['SessionRecord']] = relationship("SessionRecord", back_populates="session")
+    session_records: Mapped[list['SessionRecord']] = relationship("SessionRecord", back_populates="session")
 
 
 class SessionRecord(Base):
     __tablename__ = 'session_record'
-    user: Mapped[User] = relationship(User, back_populates="session_records")
-    user_id: Mapped[int] = relationship(ForeignKey('users'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    user: Mapped[User] = relationship(back_populates="session_records")
 
-    session: Mapped[Sessions] = relationship(Sessions, back_populates="session_records")
-    session_id: Mapped[int] = relationship(ForeignKey('sessions'))
+    session_id: Mapped[int] = mapped_column(ForeignKey('session.id'))
+    session: Mapped[Session] = relationship(back_populates="session_records")

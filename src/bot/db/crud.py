@@ -3,7 +3,7 @@ from typing import Union, Sequence
 from .manager import SessionFactory
 from sqlalchemy import select
 
-from .models import Direction
+from .models import Direction, User
 
 
 class BaseCrud:
@@ -61,7 +61,21 @@ class BaseCrud:
             session.add(obj)
             await session.commit()
 
+    async def delete(self, pk: int) -> None:
+        """
+        :param pk: int: id of instance of model
+        :param pk: int: Идентификатор записи в БД.
+        :return: None
+        """
+        async with SessionFactory().session() as session:
+            obj = await self.get(pk)
+            await session.delete(obj)
+            await session.commit()
+
 
 class DirectionCrud(BaseCrud):
     model = Direction
 
+
+class UserCrud(BaseCrud):
+    model = User

@@ -1,0 +1,47 @@
+{% extends "base/base.html" %}
+
+{% block main %}
+
+<div class="container">
+
+    <form class="mt-5" method="post">
+
+        {% if obj %}
+        <h1>{{ obj.title }}</h1>
+        {% endif%}
+
+        <div class="mb-3">
+            <label for="1" class="form-label">Имя</label>
+            <input type="text" class="form-control" id="1" required name="title"
+                   {% if obj %} value="{{obj.name}}" {% endif%}>
+        </div>
+
+        <div class="mb-3">
+            <label for="2" class="form-label">Номер телефона</label>
+            <input type="text" class="form-control" id="2" required name="title"
+                   {% if obj %} value="{{obj.phone_number}}" {%endif%}>
+        </div>
+
+        <div class="mb-3">
+            <label for="3" class="form-label">Телеграм ID</label>
+            <input type="text" class="form-control" id="3" required name="title"
+                   {% if obj %} value="{{obj.phone_number}}" {% endif %}>
+        </div>
+
+
+        <div class="mb-3">
+            <button class="btn btn-primary" type="submit">Сохранить</button>
+        </div>
+    </form>
+    {% if obj %}
+    <form action="/delete-user/" method="post">
+        <input type="hidden" value="{{obj.id}}" name="obj_id">
+        <div class="mb-3">
+            <button class="btn btn-danger" type="submit">Удалить</button>
+        </div>
+    </form>
+    {% endif%}
+
+</div>
+
+{% endblock main %}
