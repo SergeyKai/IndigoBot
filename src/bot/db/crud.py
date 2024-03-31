@@ -80,9 +80,30 @@ class DirectionCrud(BaseCrud):
 class UserCrud(BaseCrud):
     model = User
 
+    async def get_by_telegram_id(self, telegram_id: int) -> Union[model, None]:
+        async with SessionFactory().session() as session:
+            stmt = select(self.model).where(self.model.tg_id == telegram_id)
+            return await session.scalar(stmt)
+
 
 class SessionCrud(BaseCrud):
     model = Session
+
+    async def filter_by_direction_id(self, direction_id: int):
+        async with SessionFactory().session() as session:
+            stmt = select(self.model).where(self.model.direction_id == direction_id)
+            result = await session.scalars(stmt)
+            return result.all()
+
+    async def filter_by_date_direction(self, direction_id: int, date: str):
+        async with SessionFactory().session() as session:
+            stmt = select(self.model).where(
+                (self.model.direction_id == direction_id)
+                &
+                (self.model.date == date)
+            )
+            result = await session.scalars(stmt)
+            return result.all()
 
 
 class SessionRecordCrud(BaseCrud):

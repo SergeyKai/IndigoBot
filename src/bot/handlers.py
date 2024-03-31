@@ -1,9 +1,12 @@
 from aiogram import Router, F
 from aiogram.filters import Command, CommandStart
-from aiogram.types import Message, FSInputFile
+from aiogram.types import Message, FSInputFile, CallbackQuery
+from aiogram.fsm.context import FSMContext
 
+from src.bot.states import SignUpStatesGroup
 from src.bot import keyboards as kb
-from src.bot.utils import load_resources
+from src.bot.utils import load_resources, validate_phone_number
+from src.bot.db.crud import SessionCrud, UserCrud, SessionRecordCrud
 
 resource = load_resources()
 
@@ -11,7 +14,9 @@ router = Router()
 
 
 @router.message(CommandStart())
-async def start(message: Message):
+@router.message(F.text == resource.keyboards.get('cancel'))
+async def start(message: Message, state: FSMContext):
+    await state.clear()
     await message.answer(resource.texts.get('start'), reply_markup=kb.main_keyboard)
 
 
@@ -22,3 +27,89 @@ async def directions(message: Message):
         FSInputFile(resource.images.get('directions')),
         reply_markup=await kb.directions()
     )
+
+
+async def sign_up_directions(message: Message, state: FSMContext):
+    await state.set_state(SignUpStatesGroup.SELECT_DIRECTION)
+    await message.answer('Выберите направление', reply_markup=kb.cancel_keyboard)
+    await message.answer_photo(
+        FSInputFile(resource.images.get('directions')),
+        reply_markup=await kb.directions()
+    )
+
+
+@router.message(F.text == resource.keyboards.get('sign_up'))
+async def sign_up(message: Message, state: FSMContext):
+    user = await UserCrud().get_by_telegram_id(message.from_user.id)
+    if user:
+        await sign_up_directions(message, state)
+    else:
+        await message.answer('Введите ваше имя')
+        await state.set_state(SignUpStatesGroup.GET_NAME)
+
+
+@router.callback_query(SignUpStatesGroup.SELECT_DIRECTION, F.data.startswith('direction__'))
+async def sign_up_select_date(callback: CallbackQuery, state: FSMContext):
+    direction_id = callback.data.split('__')[-1]
+    sessions = await SessionCrud().filter_by_direction_id(int(direction_id))
+
+    await callback.message.answer(
+        'Выберите дату',
+        reply_markup=kb.sig_up_keyboard_builder(sessions, 'date'),
+    )
+    await state.update_data(direction_id=direction_id)
+    await state.set_state(SignUpStatesGroup.SELECT_DATE)
+    await callback.answer('select')
+
+
+@router.callback_query(SignUpStatesGroup.SELECT_DATE, F.data.startswith('date__'))
+async def sign_up_select_time(callback: CallbackQuery, state: FSMContext):
+    date = callback.data.split('__')[-1]
+    direction_id = (await state.get_data()).get('direction_id')
+    sessions = await SessionCrud().filter_by_date_direction(direction_id, date)
+    await callback.message.answer(
+        'Выберите время',
+        reply_markup=kb.sig_up_keyboard_builder(sessions, 'time'),
+    )
+    await state.update_data(date=date)
+    await state.set_state(SignUpStatesGroup.SELECT_TIME)
+
+
+@router.callback_query(SignUpStatesGroup.SELECT_TIME, F.data.startswith('time__'))
+async def sign_up_create_record(callback: CallbackQuery, state: FSMContext):
+    session_id = callback.data.split('__')[-1]
+
+    user = await UserCrud().get_by_telegram_id(callback.from_user.id)
+    session = SessionCrud().get(int(session_id))
+
+    await SessionRecordCrud().create(
+        user=user,
+        session=session
+    )
+    await callback.message.answer('Поздравляю! Вы записаны на занятие', reply_markup=kb.main_keyboard)
+    await state.clear()
+
+
+@router.message(SignUpStatesGroup.GET_NAME)
+async def user_get_name(message: Message, state: FSMContext):
+    await state.update_data(user_name=message.text)
+    await state.set_state(SignUpStatesGroup.GET_PHONE_NUMBER)
+    await message.answer('Введите номер телефона')
+
+
+@router.message(SignUpStatesGroup.GET_PHONE_NUMBER)
+async def user_get_phone_number(message: Message, state: FSMContext):
+    print('='*30)
+    print(message.text)
+    phone_number = validate_phone_number(message.text)
+    print(phone_number)
+    state_data = await state.get_data()
+    if phone_number:
+        await UserCrud().create(
+            name=state_data.get('user_name'),
+            phone_number=phone_number,
+            tg_id=message.from_user.id,
+        )
+        await sign_up_directions(message, state)
+    else:
+        await message.answer('не верный формат номера!')

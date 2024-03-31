@@ -26,6 +26,9 @@ class User(Base):
 
     session_records: Mapped[list['SessionRecord']] = relationship("SessionRecord", back_populates="user")
 
+    def __repr__(self):
+        return f'id: {self.id} phone number: {self.phone_number}'
+
 
 class Session(Base):
     __tablename__ = 'session'
@@ -38,6 +41,9 @@ class Session(Base):
 
     session_records: Mapped[list['SessionRecord']] = relationship("SessionRecord", back_populates="session")
 
+    def __repr__(self):
+        return f'id: {self.id} title: {self.title}'
+
 
 class SessionRecord(Base):
     __tablename__ = 'session_record'
@@ -46,3 +52,6 @@ class SessionRecord(Base):
 
     session_id: Mapped[int] = mapped_column(ForeignKey('session.id'))
     session: Mapped[Session] = relationship(back_populates="session_records")
+
+    def __repr__(self):
+        return f'id: {self.id} user: {self.user_id} session: {self.session_id}'

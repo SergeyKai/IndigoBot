@@ -24,9 +24,9 @@ async def list_sessions_records(request: Request):
     return templates.TemplateResponse('model_templates/model_list.html', ctx)
 
 
-@router.get('/form-sessions_records/{direction_id}')
-async def form_direction_detail(request: Request, direction_id: int = Path()):
-    obj = await SessionRecordCrud().get(direction_id)
+@router.get('/form-sessions_records/{session_record_id}')
+async def form_session_record_detail(request: Request, session_record_id: int = Path()):
+    obj = await SessionRecordCrud().get(session_record_id)
     ctx = {
         'request': request,
         'obj': obj,
@@ -36,9 +36,9 @@ async def form_direction_detail(request: Request, direction_id: int = Path()):
     return templates.TemplateResponse('model_templates/forms/session_record.html', ctx)
 
 
-@router.post('/form-sessions_records/{direction_id}')
-async def form_update_direction_detail(request: Request, direction_id: int = Path()):
-    obj = await SessionRecordCrud().get(direction_id)
+@router.post('/form-sessions_records/{session_record_id}')
+async def form_update_session_record_detail(request: Request, session_record_id: int = Path()):
+    obj = await SessionRecordCrud().get(session_record_id)
     data = await request.form()
 
     for attr, value in data.items():
