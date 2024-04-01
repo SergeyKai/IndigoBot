@@ -3,10 +3,10 @@ from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, FSInputFile, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
-from src.bot.states import SignUpStatesGroup
-from src.bot import keyboards as kb
-from src.bot.utils import load_resources, validate_phone_number
-from src.bot.db.crud import SessionCrud, UserCrud, SessionRecordCrud
+from bot.states import SignUpStatesGroup
+from bot import keyboards as kb
+from bot.utils import load_resources, validate_phone_number
+from bot.db.crud import SessionCrud, UserCrud, SessionRecordCrud, DirectionCrud
 
 resource = load_resources()
 
@@ -78,6 +78,13 @@ async def sign_up_select_date(callback: CallbackQuery, state: FSMContext):
     await state.update_data(direction_id=direction_id)
     await state.set_state(SignUpStatesGroup.SELECT_DATE)
     await callback.answer('select')
+
+
+@router.callback_query(F.data.startswith('direction__'))
+async def direction_info(callback: CallbackQuery):
+    direction_id = callback.data.split('__')[-1]
+    direction = await DirectionCrud().get(int(direction_id))
+    await callback.message.answer(direction.description)
 
 
 @router.callback_query(SignUpStatesGroup.SELECT_DATE, F.data.startswith('date__'))

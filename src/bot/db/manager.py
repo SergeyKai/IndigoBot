@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy import create_engine
-from src.bot.settings import DBConfig
+from bot.settings import DBConfig
 
 
 class SessionFactory:

@@ -6,7 +6,7 @@ import logging
 from bot import main_router
 
 from bot.settings import BotConfig
-from src.bot.commands import Commands
+from bot.commands import Commands
 
 
 async def bot_start(bot: Bot) -> None:

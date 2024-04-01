@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.types import BotCommand, BotCommandScopeDefault, BotCommandScopeChat
 
-from src.bot.settings import BotConfig
+from bot.settings import BotConfig
 
 
 class Commands:

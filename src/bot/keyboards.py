@@ -1,9 +1,9 @@
 from aiogram.types import InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.bot.db.crud import DirectionCrud
+from bot.db.crud import DirectionCrud
 
-from src.bot.utils import load_resources
+from bot.utils import load_resources
 
 resource = load_resources()
 
