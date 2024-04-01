@@ -1,0 +1,23 @@
+{% extends "base/base.html" %}
+
+{% block main %}
+
+<div class="container mt-4">
+
+
+    <nav class="d-flex justify-content-between">
+        <h1>{{ title }}</h1>
+        <div class="">
+            <a href="{{ form_url }}" class="btn btn-primary">Создать</a>
+        </div>
+    </nav>
+
+    {% for obj in list_objects %}
+    <ul class="mt-5 ">
+        <li><a href="{{ form_url }}{{ obj.id }}">{{ obj }}</a></li>
+    </ul>
+    {% endfor %}
+
+</div>
+
+{% endblock main %}

@@ -11,12 +11,12 @@ BASE_DIR = Path(__file__).parent.parent.parent
 
 @dataclass
 class DBConfig:
+    """ конфигурации для БД """
     DB_URL = f'sqlite+aiosqlite:///{BASE_DIR}/db.sqlite3'
 
 
 @dataclass
 class BotConfig:
+    """ конфигурации для бота """
     TOKEN: str = os.getenv('TOKEN')
-
-
-print(BASE_DIR)
+    ADMIN_ID: str = os.getenv('ADMIN_ID')
