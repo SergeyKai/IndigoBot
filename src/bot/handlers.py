@@ -16,6 +16,9 @@ router = Router()
 @router.message(CommandStart())
 @router.message(F.text == resource.keyboards.get('cancel'))
 async def start(message: Message, state: FSMContext):
+    """ обработчик команды start
+        запуск бота / приветственное сообщение
+    """
     await state.clear()
     await message.answer(resource.texts.get('start'), reply_markup=kb.main_keyboard)
 
@@ -23,6 +26,10 @@ async def start(message: Message, state: FSMContext):
 @router.message(F.text == resource.keyboards.get('directions'))
 @router.message(Command('directions'))
 async def directions(message: Message):
+    """
+     обработчик команды directions
+     выводит список направлений
+    """
     await message.answer_photo(
         FSInputFile(resource.images.get('directions')),
         reply_markup=await kb.directions()
@@ -30,6 +37,10 @@ async def directions(message: Message):
 
 
 async def sign_up_directions(message: Message, state: FSMContext):
+    """
+    <запись на занятие>
+    обработчик для выбора направления
+     """
     await state.set_state(SignUpStatesGroup.SELECT_DIRECTION)
     await message.answer('Выберите направление', reply_markup=kb.cancel_keyboard)
     await message.answer_photo(
@@ -40,6 +51,9 @@ async def sign_up_directions(message: Message, state: FSMContext):
 
 @router.message(F.text == resource.keyboards.get('sign_up'))
 async def sign_up(message: Message, state: FSMContext):
+    """
+    Проверка присутствует ли пользователь в БД
+     """
     user = await UserCrud().get_by_telegram_id(message.from_user.id)
     if user:
         await sign_up_directions(message, state)
@@ -50,6 +64,10 @@ async def sign_up(message: Message, state: FSMContext):
 
 @router.callback_query(SignUpStatesGroup.SELECT_DIRECTION, F.data.startswith('direction__'))
 async def sign_up_select_date(callback: CallbackQuery, state: FSMContext):
+    """
+    <запись на занятие>
+    обработчик для выбора даты
+     """
     direction_id = callback.data.split('__')[-1]
     sessions = await SessionCrud().filter_by_direction_id(int(direction_id))
 
@@ -64,6 +82,10 @@ async def sign_up_select_date(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(SignUpStatesGroup.SELECT_DATE, F.data.startswith('date__'))
 async def sign_up_select_time(callback: CallbackQuery, state: FSMContext):
+    """
+    <запись на занятие>
+    обработчик для выбора времени
+     """
     date = callback.data.split('__')[-1]
     direction_id = (await state.get_data()).get('direction_id')
     sessions = await SessionCrud().filter_by_date_direction(direction_id, date)
@@ -77,6 +99,10 @@ async def sign_up_select_time(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(SignUpStatesGroup.SELECT_TIME, F.data.startswith('time__'))
 async def sign_up_create_record(callback: CallbackQuery, state: FSMContext):
+    """
+    <запись на занятие>
+    обработчик для сохранения информации о записи в БД
+     """
     session_id = callback.data.split('__')[-1]
 
     user = await UserCrud().get_by_telegram_id(callback.from_user.id)
@@ -92,6 +118,10 @@ async def sign_up_create_record(callback: CallbackQuery, state: FSMContext):
 
 @router.message(SignUpStatesGroup.GET_NAME)
 async def user_get_name(message: Message, state: FSMContext):
+    """
+    <регистрация пользователя>
+    обработчик для получения имени пользователя
+     """
     await state.update_data(user_name=message.text)
     await state.set_state(SignUpStatesGroup.GET_PHONE_NUMBER)
     await message.answer('Введите номер телефона')
@@ -99,10 +129,11 @@ async def user_get_name(message: Message, state: FSMContext):
 
 @router.message(SignUpStatesGroup.GET_PHONE_NUMBER)
 async def user_get_phone_number(message: Message, state: FSMContext):
-    print('='*30)
-    print(message.text)
+    """
+    <регистрация пользователя>
+    обработчик для получения ноимера телефона и добавления пользователя в БД
+     """
     phone_number = validate_phone_number(message.text)
-    print(phone_number)
     state_data = await state.get_data()
     if phone_number:
         await UserCrud().create(

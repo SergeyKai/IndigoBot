@@ -81,6 +81,11 @@ class UserCrud(BaseCrud):
     model = User
 
     async def get_by_telegram_id(self, telegram_id: int) -> Union[model, None]:
+        """
+        Метода для получения пользователя по id telegramm
+        :param telegram_id: int
+        :return: obj: объект ORM
+        """
         async with SessionFactory().session() as session:
             stmt = select(self.model).where(self.model.tg_id == telegram_id)
             return await session.scalar(stmt)
@@ -90,12 +95,23 @@ class SessionCrud(BaseCrud):
     model = Session
 
     async def filter_by_direction_id(self, direction_id: int):
+        """
+        Функция для получения списка объектов модели Session связанных с direction_id
+        :param direction_id: id записи в БД
+        :return: список объектоав ОРМ
+        """
         async with SessionFactory().session() as session:
             stmt = select(self.model).where(self.model.direction_id == direction_id)
             result = await session.scalars(stmt)
             return result.all()
 
     async def filter_by_date_direction(self, direction_id: int, date: str):
+        """
+        Функция для получения списка объектов модели Session связанных с direction_id и по дате
+        :param direction_id: id записи в БД
+        :date: str : Дата  в формате "YYYY-MM-DD"
+        :return: список объектоав ОРМ
+        """
         async with SessionFactory().session() as session:
             stmt = select(self.model).where(
                 (self.model.direction_id == direction_id)

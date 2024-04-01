@@ -5,6 +5,9 @@ from src.bot.settings import BotConfig
 
 
 class Commands:
+    """
+    Основные команды бота
+    """
     START_COMMAND = BotCommand(command='start', description='Запуск бота')
     HELP_COMMAND = BotCommand(command='help', description='Помощь')
     CANCEL_COMMAND = BotCommand(command='directions', description='Наши направления')

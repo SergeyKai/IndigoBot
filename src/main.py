@@ -10,6 +10,7 @@ from src.bot.commands import Commands
 
 
 async def bot_start(bot: Bot) -> None:
+    """ функция срабатывает при запуске бота """
     await Commands.set_commands(bot)
     await bot.send_message(BotConfig.ADMIN_ID, text='Bot is running')
 
