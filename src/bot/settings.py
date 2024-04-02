@@ -20,3 +20,10 @@ class BotConfig:
     """ конфигурации для бота """
     TOKEN: str = os.getenv('TOKEN')
     ADMIN_ID: str = os.getenv('ADMIN_ID')
+
+    BROKER = 'redis://localhost:6379/1'
+
+
+class TaskConfig:
+    enable_utc = True
+    timezone = 'Europe/London'

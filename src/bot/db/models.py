@@ -53,5 +53,7 @@ class SessionRecord(Base):
     session_id: Mapped[int] = mapped_column(ForeignKey('session.id'))
     session: Mapped[Session] = relationship(back_populates="session_records")
 
+    relevant: Mapped[bool] = mapped_column(default=True)
+
     def __repr__(self):
         return f'id: {self.id} user: {self.user_id} session: {self.session_id}'

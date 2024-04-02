@@ -1,8 +1,8 @@
-"""Create table
+"""add field relevant in table session_record
 
-Revision ID: ba6d341c1d84
+Revision ID: 168456ed79bd
 Revises: 
-Create Date: 2024-04-01 15:20:32.582974
+Create Date: 2024-04-02 19:22:43.006700
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'ba6d341c1d84'
+revision: str = '168456ed79bd'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -45,6 +45,7 @@ def upgrade() -> None:
     op.create_table('session_record',
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('session_id', sa.Integer(), nullable=False),
+    sa.Column('relevant', sa.Boolean(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.ForeignKeyConstraint(['session_id'], ['session.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),

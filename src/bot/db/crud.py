@@ -1,7 +1,10 @@
+from datetime import datetime
 from typing import Union, Sequence
+from sqlalchemy import and_
+from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 
 from .manager import SessionFactory
-from sqlalchemy import select
 
 from .models import Direction, User, Session, SessionRecord
 
@@ -124,3 +127,44 @@ class SessionCrud(BaseCrud):
 
 class SessionRecordCrud(BaseCrud):
     model = SessionRecord
+
+    async def all_with_related(self):
+        async with SessionFactory().session() as session:
+            stmt = (
+                select(self.model)
+                .where(self.model.relevant == True)
+                .options(
+                    selectinload(self.model.session),
+                    selectinload(self.model.user),
+                )
+            )
+            result = await session.scalars(stmt)
+            return result.all()
+
+    async def get_records_for_today(self):
+        async with SessionFactory().session() as session:
+            stmt = (
+                select(self.model)
+                .join(Session)
+                .filter(func.date(Session.date) == datetime.today().date())
+            )
+            result = await session.scalars(stmt)
+            return result.all()
+
+    async def get_sessions_before_time(self, reminder_time):
+        async with SessionFactory().session() as session:
+            stmt = (
+                select(self.model)
+                .join(self.model.session)
+                .where(and_(
+                    self.model.relevant == True,
+                    Session.date == datetime.today().date(),
+                    Session.time <= reminder_time
+                ))
+                .options(
+                    selectinload(self.model.user),
+                    selectinload(self.model.session),
+                )
+            )
+            result = await session.scalars(stmt)
+            return result.all()

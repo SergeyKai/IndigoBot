@@ -1,4 +1,4 @@
-from aiogram import Router, F
+from aiogram import Router, F, Bot
 from aiogram.filters import Command, CommandStart
 from aiogram.types import Message, FSInputFile, CallbackQuery
 from aiogram.fsm.context import FSMContext
@@ -105,7 +105,7 @@ async def sign_up_select_time(callback: CallbackQuery, state: FSMContext):
 
 
 @router.callback_query(SignUpStatesGroup.SELECT_TIME, F.data.startswith('time__'))
-async def sign_up_create_record(callback: CallbackQuery, state: FSMContext):
+async def sign_up_create_record(callback: CallbackQuery, state: FSMContext, bot: Bot):
     """
     <запись на занятие>
     обработчик для сохранения информации о записи в БД
@@ -113,7 +113,7 @@ async def sign_up_create_record(callback: CallbackQuery, state: FSMContext):
     session_id = callback.data.split('__')[-1]
 
     user = await UserCrud().get_by_telegram_id(callback.from_user.id)
-    session = SessionCrud().get(int(session_id))
+    session = await SessionCrud().get(int(session_id))
 
     await SessionRecordCrud().create(
         user=user,
